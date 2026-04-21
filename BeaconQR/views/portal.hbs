@@ -1,0 +1,53 @@
+<div class="container text-center mt-5">
+  <h1>BeaconQR</h1>
+  <h2 class="mb-4">Welcome, {{client.name}}!</h2>
+
+  <div class="row g-3">
+    <div class="col-6">
+      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('Food')">Food</button>
+    </div>
+    <div class="col-6">
+      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('Shelter')">Shelter</button>
+    </div>
+    <div class="col-6">
+      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('Medical')">Medical</button>
+    </div>
+    <div class="col-6">
+      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('Shower')">Shower</button>
+    </div>
+    <div class="col-6">
+      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('Clothes')">Clothes</button>
+    </div>
+    <div class="col-6">
+      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('CaseWorker')">Case CaseWorker</button>
+    </div>
+  </div>
+  <button class="btn btn-warming btn-lg mt-4 w-100" onclick="findHelp('General')">Find Near Me</button>
+</div>
+
+<script>
+  function findHelp(need) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        //update in database
+        fetch('/update-location', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            qrID: "{{client.qrID}}",
+            lat: lat, 
+            lng: lng, 
+            need: need
+          })
+        }).then(() => {
+          window.location.href = '/results?need=${need}&lat=${lat}&lng=${lng}';
+        });
+      });
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  }
+</script>

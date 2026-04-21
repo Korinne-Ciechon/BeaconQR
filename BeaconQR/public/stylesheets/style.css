@@ -1,0 +1,14 @@
+body {
+  background-color: #f8f9fa;
+  font-family: "Segoe UI", 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.btn-lg {
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 15px;
+}
+ .card {
+  border-radius: 20px;
+  border: none;
+ }

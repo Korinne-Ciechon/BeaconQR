@@ -1,0 +1,24 @@
+<div class="container mt-5">
+    <h1>BeaconQR</h1>
+    <h3>Family Connection Portal</h3>
+    <hr>
+
+    <div class="card shadow">
+        <div class="card-body text-center">
+            <h4>Status for: **{{client.name}}**</h4>
+
+            {{#if activeRecently}}
+                <div class="alert alert-success">Active: Checked in within last 24 hours.</div>
+            {{else}}
+                <div class="alert alert-warning">Inactive: No check-in for over 24 hours.</div>
+            {{/if}}  
+
+            <div class="mt-4 p-3 bg-light border rounded text-start">
+                <h5>Last Known Area:</h5>
+                <p><strong>Neighborhood:</strong>Downtown / Near Central Park</p>
+                <p><strong>Searching for:</strong>{{client.lastNeed}}</p>
+                <p><strong>Time:</strong>{{client.lastSeen}}</p>
+            </div>  
+        </div>
+    </div>
+</div>
