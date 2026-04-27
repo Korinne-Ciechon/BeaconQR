@@ -99,7 +99,7 @@ app.post('/update-location', async (req,res) => {
   try {
     const { qrID, lat, lng, need } = req.body;
     await Client.update(
-      { lastLat: lat, lasting: lng, lastSeen: new Date(), lastNeed: need },
+      { lastLat: lat, lastLng: lng, lastSeen: new Date(), lastNeed: need },
       { where: { qrID: qrID } }
     );
     res.json({ success: true });
@@ -108,7 +108,25 @@ app.post('/update-location', async (req,res) => {
   }
 });
 
+// Results
+app.get('/results', (req, res) => {
+  res.render('results', { 
+    title: 'Nearby Resources', 
+    need: req.query.need 
+  });
+});
+
 // Family view
+
+app.get('/family-lookup', (req, res) => {
+  const id = req.query.qrID;
+  if (id) {
+    res.redirect(`/family/${id}`);
+  } else {
+    res.redirect('/');
+  }
+});
+
 app.get('/family/:qrID', async (req,res) => {
   try {
     const client = await Client.findOne({ where: {qrID: req.params.qrID } });
@@ -133,4 +151,31 @@ app.use((err, req, res, next) => {
   res.render('error');
 });
 
+
+// Caseworker Dashboard (shows all clients)
+app.get('/caseworker', async (req, res) => {
+  try {
+    const allClients = await Client.findAll();
+    //convert to plain JSON
+    const cleanData = allClients.map(c => c.get({ plain: true }));
+
+    res.render('caseworker', {
+      title: 'Caseworker Dashboard',
+      clients: cleanData
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+
+
+
 module.exports = app;
+
+// const PORT = 3000;
+// app.listen(PORT, () => {
+//   console.log(`BeaconQR Server running on http://localhost:${PORT}`);
+//   console.log('try visisting: http://localhost:3000/portal/david123');
+// });
+// module.exports = app;

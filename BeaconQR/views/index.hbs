@@ -1,2 +1,22 @@
-<h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
+<div class="hero-section">
+    <h1>Welcome to BeaconQR</h1>
+    <p>Connecting communities through safety and support.</p>
+</div>
+
+<div class="entry-grid">
+    <div class="entry-card caseworker-card">
+        <h2>Caseworker Portal</h2>
+        <p>Access the dashboard to monitor and support your clients.</p>
+        <a href="/caseworker" class="btn btn-blue">Staff Sign-In</a>
+    </div>
+
+    <div class="entry-card family-card">
+        <h2>Family Resources</h2>
+        <p>Stay updated on your loved ones' status and safety.</p>
+        <form action="/family-lookup" method="GET" class="lookup-form">
+            <input type="text" name="qrID" placeholder="Enter Client QR ID" required>
+            <button type="submit" class="btn btn-green">Check Status</button>
+        </form>
+    </div>
+</div>
+

@@ -1,3 +1,51 @@
+<div class="dashboard-container">
+  <header class="dashoard-header">
+    <h1>Caseworker Dashboard</h1>
+    <p>Monitoring all active Beacon Beacons</p>
+  </header>
+
+  <div class="table-responsive">
+    <table class="caseworker-table">
+      <thead>
+        <tr>
+          <th>Client Name</th>
+          <th>QR ID</th>
+          <th>Status</th>
+          <th>Last Seen</th>
+          <th>Last Need</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each clients}}
+        <tr>
+          <td><strong>{{this.name}}</strong></td>
+          <td><code>{{this.qrID}}</code></td>
+          {{#if this.activeRecently}}
+            <td class="status-active">ACTIVE</td>
+          {{else}}
+            <td class="status-inactive">INACTIVE</td>
+          {{/if}}
+          <td><span class="need-badge">{{this.lastSeen}}</span></td>
+          <td>{{this.lastNeed}}</td>
+          <td>
+              <a href="/family/{{this.qrID}}" class="view-link">View Safety Profile</a>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
 <form action="/chart" method="post">
   <label for="color">Color:</label>
   <select id="color" name="color" required>

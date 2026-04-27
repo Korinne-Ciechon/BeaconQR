@@ -1,24 +1,26 @@
-<div class="container mt-5">
-    <h1>BeaconQR</h1>
-    <h3>Family Connection Portal</h3>
+<div class="family-portal">
+    <h1>Family Monitoring: {{client.name}}</h1>
+    <p class="form-label"> QR ID: {{client.qrID}}</p>
     <hr>
 
-    <div class="card shadow">
-        <div class="card-body text-center">
-            <h4>Status for: **{{client.name}}**</h4>
+    <div class="status-container">
+        {{#if activeRecently}}
+            <div class="status-indicator status-active">
+                <span class="dot"></span> 
+                <h2>ACTIVE</h2>
+                <p>Checked in within last 24 hours.</p>
+            </div>
+        {{else}}
+            <div class="status-indicator status-inactive">
+                <span class="dot"></span>
+                <h2>INACTIVE</h2>
+                <p>No check-in recorded in the last 24 hours.</p>
 
-            {{#if activeRecently}}
-                <div class="alert alert-success">Active: Checked in within last 24 hours.</div>
-            {{else}}
-                <div class="alert alert-warning">Inactive: No check-in for over 24 hours.</div>
-            {{/if}}  
-
-            <div class="mt-4 p-3 bg-light border rounded text-start">
-                <h5>Last Known Area:</h5>
-                <p><strong>Neighborhood:</strong>Downtown / Near Central Park</p>
-                <p><strong>Searching for:</strong>{{client.lastNeed}}</p>
-                <p><strong>Time:</strong>{{client.lastSeen}}</p>
-            </div>  
-        </div>
+            </div>
+        {{/if}}
+    </div>
+    <div class="details-box">
+        <p><strong>Last Seen:</strong> {{client.lastSeen}}</p>
+        <p><strong>Last Need:</strong> {{client.lastNeed}}</p>
     </div>
 </div>

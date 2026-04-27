@@ -1,7 +1,127 @@
-body {
-  background-color: #f8f9fa;
-  font-family: "Segoe UI", 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+:root {
+  --beacon-blue: #5e8fcb;
+  --beacon-green: #3fb65b;
+  --bg-light: #f7fafc;
+  --text-main: #2d3748;
 }
+
+body {
+  background-color: var(--bg-light);
+  color: var(--text-main);
+  font-family: "Inter", -apple-system, sans-serif;
+  margin: 0;
+}
+
+/* Header Styles */
+.main-nav {
+  background: white;
+  color: var(--text-main);
+  font-family: 'Inter', -apple-system, sans-serif;
+  margin: 0;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 10px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* keeps above when scrolling!! */
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.brand {
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--beacon-blue);
+}
+
+.qr-highlight {
+  color: var(--beacon-green);
+}
+
+/* landing page grid */
+.hero-section {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #ebf8ff 0%, #f0fff4 100%);
+}
+
+.entry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: -40px auto 40px;
+  padding: 0 20px;
+}
+
+.entry-card {
+  background: white;
+  border-radius: 15px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.entry-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 30px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 15px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-blue {
+  background-color: var(--beacon-blue);
+  color: white;
+}
+.btn-green {
+  background-color: var(--beacon-green);
+  color: white;
+}
+
+.lookup-form input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+
+}
+
+/* navigation bar */
+nav-logo {
+  height: 5px;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+
 
 .btn-lg {
   font-size: 1.5rem;
@@ -12,3 +132,117 @@ body {
   border-radius: 20px;
   border: none;
  }
+
+
+
+ /* Family Portal Styles */
+.family-portal {
+  text-align: center;
+  max-width: 600px;
+  margin: 40px auto;
+  font-family: sans-serif;
+}
+
+.qr-label{
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.status-container {
+  margin: 30px 0;
+}
+
+/* Green for active, red for inactive */
+.status-active {
+  background-color: #28a745;
+}
+
+.status-inactive {
+  background-color: #fe011a;
+}
+
+.dot {
+  height: 15px;
+  width: 15px;
+  background-color: white;
+  border-radius: 50%;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.details-box {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: left;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-header {
+  margin-bottom: 30px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
+}
+
+/* Table Styles */
+.caseworker-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.caseworker-table th {
+  background-color: #4a90e2;
+  color: white;
+  padding: 12px;
+  text-align: left;
+}
+
+.caseworker-table td {
+  padding: auto;
+  border-bottom: 1px solid #eee;
+}
+
+.caseworker-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* UI Elements */
+.need-badge {
+  background: #e1f5fe;
+  color: #01579b;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.status-dot {
+  height: 12px;
+  width: 12px;
+  background-color: #28a745; /* Green for active */
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.view-link {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.view-link:hover {
+  text-decoration: underline;
+}
