@@ -81,7 +81,12 @@ app.get('/', (req, res) => {
 
 // lookup redirects
 app.get('/portal-lookup', (req, res) => {
-  res.redirect(`/portal/${req.query.qrID}`);
+  const id = req.query.qrID;
+  if (id) {
+    res.redirect(`/portal/${id}`);
+  } else {
+    res.redirect('/');
+  }
 });
 
 app.get('/family-lookup', (req, res) => {

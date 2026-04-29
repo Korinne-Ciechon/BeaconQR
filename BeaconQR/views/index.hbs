@@ -1,25 +1,37 @@
 <div class="hero-section">
     <h1>Welcome to BeaconQR</h1>
-    <p>Connecting communities through safety and support.</p>
+        <p>Connecting communities through safety and support.</p>
 </div>
-
+    
 <div class="entry-card client-card">
     <div class="card-icon">Card</div>
     <h2>Client Check-In</h2>
     <p>Scan your QR code or enter your ID to find resources near you.</p>
-    <form action="/portal-lookup" method="GET" class="lookup-form">
-        <input type="text" name="qrID" placeholder="Enter your iD (e.g., david123)" required>
-        <button type="submit" class="btn btn-blue">Open My Portal</button>
-    </form>
+                
+    <div id="scanner-container" style="display:none; margin-bottom: 20px;">
+        <div id="reader" style="width: 100%; max-width: 400px; margin: auto;"></div>
+        <button type="button" class="btn btn-red mt-2" onclick="stopScanner()">Cancel Scan</button>
+    </div>
+                                                
+    <div id="check-in-actions">
+        <button type="button" class="btn btn-blue mb-3" style="width: 100%; background-color: #2c3e50;" onclick="startScanner()">Click to scan QR Code</button>
+            
+        <p style="font-size: 0.8rem; color: #888;">- OR MANUAL ENTER -</p>
+                                                                    
+        <form action="/portal-lookup" method="GET" class="lookup-form">
+            <input type="text" name="qrID" placeholder="Enter your iD (e.g., david123)" required>
+            <button type="submit" class="btn btn-blue">Open My Portal</button>
+        </form>
+    </div>
 </div>
-
+                                                                                                            
 <div class="entry-grid">
     <div class="entry-card caseworker-card">
         <h2>Caseworker Portal</h2>
         <p>Access the dashboard to monitor and support your clients.</p>
         <a href="/caseworker" class="btn btn-blue">Staff Sign-In</a>
     </div>
-
+                                                                                                                                            
     <div class="entry-card family-card">
         <h2>Family Resources</h2>
         <p>Stay updated on your loved ones' status and safety.</p>
@@ -30,3 +42,47 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/html5-qrcode"></script>
+                                                                                                                                                                                                            
+<script>
+    let html5QrCode;
+                                                                                                                                                                                                                    
+    async function startScanner() {
+        document.getElementById('scanner-container').style.display = 'block';
+        document.getElementById('check-in-actions').style.display = 'none';
+                                                                                                                                                                                                                                        
+        html5QrCode = new Html5Qrcode("reader");
+                                                                                                                                                                                                                                                
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        
+        try {
+            await html5QrCode.start(
+                { facingMode: "environment" }, 
+                config,
+                (decodedText) => {
+                    document.getElementById('qrID-input').value = decodedText;
+                    document.getElementById('manual-form').submit();
+                    stopScanner();
+                }
+            );
+        } catch (err) {
+            console.error("Camera access denied", err);
+            alert("Unable to access camera. Please allow camera permissions or enter your ID manually.");
+            stopScanner();
+        }
+    }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+    function stopScanner() {
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                document.getElementById('scanner-container').style.display = 'none';
+                document.getElementById('check-in-actions').style.display = 'block';
+                html5QrCode = null;
+            }).catch(err => {
+                console.error("Error stopping scanner", err);
+                document.getElementById('scanner-container').style.display = 'none';
+                document.getElementById('check-in-actions').style.display = 'block';    
+            });
+        }
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+</script>
