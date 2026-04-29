@@ -29,7 +29,6 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1100px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -44,6 +43,146 @@ body {
 .qr-highlight {
   color: var(--beacon-green);
 }
+
+/* Client Portal Styles */
+.client-portal-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.portal-header h1{
+  color: var(--beacon-blue);
+  margin-bottom: 5px;
+}
+
+.needs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 30px 0;
+}
+
+.need-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px;
+  border: none;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--beacon-blue);
+}
+
+.need-btn:active {
+  transform: scale(0.95);
+  background: #f0fff4;
+}
+
+.need-btn .icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.map-container {
+  margin-top: 40px;
+  padding: 20px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+#map {
+  height: 400px;
+  width: 100%;
+  border-radius: 15px;
+  border: 2px solid #e2e8f0;
+  margin-top: 15px;
+}
+
+.map-container h3 {
+  color: var(--beacon-blue);
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+
+.user-location-dot {
+  background-color: #007bff;
+  width: 12px;
+  height: 12px;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+/* List View for patient needs */
+.resource-list {
+  margin-top: 15px;
+  max-height: 300px;
+  overflow-y: auto;
+  text-align: left;
+  background: #fdfdfd;
+  border-radius: 10px;
+}
+
+.resource-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.resource-item:hover {
+  background: #f0f7ff;
+}
+
+.res-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.res-info strong {
+  color: var(--beacon-blue);
+  font-size: 1.1rem;
+}
+
+.res-info span {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.rest-stats {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.miles {
+  font-weight: bold;
+  color: var(--beacon-green);
+}
+
+.walk {
+  font-size: 0.8rem;
+  color: #666; 
+}
+
+.list-hint {
+  padding: 20px;
+  color: #999;
+  font-style: italic;
+  text-align: center;
+}
+
 
 /* landing page grid */
 .hero-section {
@@ -109,8 +248,8 @@ body {
 }
 
 /* navigation bar */
-nav-logo {
-  height: 5px;
+.nav-logo {
+  max-height: 40px;
   width: auto;
   object-fit: contain;
 }

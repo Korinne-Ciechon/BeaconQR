@@ -1,53 +1,180 @@
-<div class="container text-center mt-5">
-  <h1>BeaconQR</h1>
-  <h2 class="mb-4">Welcome, {{client.name}}!</h2>
+<div class="client-portal-container">
+  <header class="portal-header">
+    <h1>Hello, {{client.name}}!</h1>
+    <p>What do you need help with today?</p>
+  </header>
 
-  <div class="row g-3">
-    <div class="col-6">
-      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('Food')">Food</button>
-    </div>
-    <div class="col-6">
-      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('Shelter')">Shelter</button>
-    </div>
-    <div class="col-6">
-      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('Medical')">Medical</button>
-    </div>
-    <div class="col-6">
-      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('Shower')">Shower</button>
-    </div>
-    <div class="col-6">
-      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('Clothes')">Clothes</button>
-    </div>
-    <div class="col-6">
-      <button class="btn btn-primary btn-lg w-100 py-5" onclick="findHelp('CaseWorker')">Case CaseWorker</button>
+  <div class="needs-grid">
+    <button class="need-btn" onclick="updateNeed('Food', '{{client.qrID}}')">
+      <span class="icon">🍎</span>
+      <span>Food</span>
+    </button>
+    <button class="need-btn" onclick="updateNeed('Shelter', '{{client.qrID}}')">
+      <span class="icon">🏠</span>
+      <span>Shelter</span>
+    </button>
+    <button class="need-btn" onclick="updateNeed('Medical', '{{client.qrID}}')">
+      <span class="icon">🏥</span>
+      <span>Medical</span>
+    </button>
+    <button class="need-btn" onclick="updateNeed('Shower/Hygiene', '{{client.qrID}}')">
+      <span class="icon">🚿</span>
+      <span>Shower/Hygiene</span>
+    </button>
+    <button class="need-btn" onclick="updateNeed('Clothing', '{{client.qrID}}')">
+      <span class="icon">👕</span>
+      <span>Clothing</span>
+    </button>
+    <button class="need-btn" onclick="updateNeed('CaseWorker', '{{client.qrID}}')">
+      <span class="icon">👩‍💼</span>
+      <span>CaseWorker</span>
+    </button>
+  </div>
+
+  <div id="map-section" class="map-containter">
+    <h3>Resources Near You</h3>
+    <div id="map"></div>
+
+    <div id="resource-list" class="resource-list">
+      <p class="list-hint">Select a category above to see locations</p>
     </div>
   </div>
-  <button class="btn btn-warming btn-lg mt-4 w-100" onclick="findHelp('General')">Find Near Me</button>
 </div>
 
-<script>
-  function findHelp(need) {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        //update in database
-        fetch('/update-location', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            qrID: "{{client.qrID}}",
-            lat: lat, 
-            lng: lng, 
-            need: need
-          })
-        }).then(() => {
-          window.location.href = '/results?need=${need}&lat=${lat}&lng=${lng}';
-        });
+<script>
+  // Initialize the map (coral gables center by default)
+  const map = L.map('map').setView([25.7492, -80.2632], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  // Local Coral Gables Resources (In a real app, this would come from the database based on the client's needs)
+  const resources = [
+    { name: "Coral Gables Congregational", type: "Food", lat: 25.7436, lng: -80.2687, address: "3010 De Soto Blvd" },
+    { name: "St. Augustine Church", type: "Food", lat: 25.7191, lng: -80.2594, address: "1103 Anastasia Ave" },
+    { name: "Chapman Partnership", type: "Shelter", lat: 25.7905, lng: -80.1947, address: "1550 N Miami Ave" },
+    { name: "UM Health Clinic", type: "Medical", lat: 25.7505, lng: -80.2700, address: "5555 Ponce de Leon" },
+    { name: "Ponce Clinic", type: "Medical", lat: 25.7480, lng: -80.2580, address: "Coral Gables, FL" }
+  ];
+
+  let userLat = 25.7492;
+  let userLng = -80.2632;
+  let currentMarkers = [];
+
+  // Find client's real location and center map
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      userLat = position.coords.latitude;
+      userLng = position.coords.longitude;
+      map.setView([userLat, userLng], 14);
+
+      // Blue Dot
+      L.marker([userLat, userLng], {icon: L.divIcon({className: 'user-location-dot'})}).addTo(map)
+        .bindPopup("You are here").openPopup();
+    });
+  }
+
+  // Action Function
+  async function updateNeed(need, qrID) {
+    try {
+      // update database
+      await fetch(`/update-location`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qrID: qrID, need: need, lat: userLat, lng: userLng })
       });
-    } else {
-      alert("Geolocation is not supported by this browser.");
+
+      // clear previous search pins
+      currentMarkers.forEach(m => map.removeLayer(m));
+      currentMarkers = [];
+
+      // Filter and Build List
+      const filtered = resources.filter(r => r.type.includes(need));
+      const listDiv = document.getElementById('resource-list');
+      listDiv.innerHTML = ''; // Clear previous results
+
+      if (filtered.length == 0) {
+        listDiv.innerHTML = '<p class="list-hint">No resources found for this category.</p>';
+        return;
+      }
+
+      filtered.forEach(res => {
+        // Calculate Distance and Walk Time
+        const distance = map.distance([userLat, userLng], [res.lat, res.lng]);
+        const miles = (distance * 0.000621371).toFixed(1);
+        const walkMin = Math.round((distance / 80)); 
+        
+        // Add Pin to Map
+        const marker = L.marker([res.lat, res.lng]).addTo(map)
+          .bindPopup(`<b>${res.name}</b><br>Address: ${res.address}`);
+        currentMarkers.push(marker);
+
+        // Add to List
+        const item = document.createElement('div');
+        item.className = 'resource-item';
+        item.innerHTML = `
+        <div class="res-info">
+          <strong>${res.name}</strong>
+          <span>${res.address}</span>
+        </div>
+        <div class="res-stats">
+          <span class="miles">${miles} miles</span>
+          <span class="walk">~${walkMin} min walk</span>
+        </div>
+        `;
+
+        // Clicking an item zooms to it
+        item.onclick = () => {
+          map.flyTo([res.lat, res.lng], 16);
+          marker.openPopup();
+        };
+        listDiv.appendChild(item);
+      });
+
+      //Scroll down to show the results
+      document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      console.error("Update failed", err);
     }
   }
 </script>
+
+{{!-- 
+      // Draw lines/distances to resources
+      resources.forEach(res => {
+        const distance = map.distance([lat, lng], [res.lat, res.lng]);
+        const distanceMiles = (distance * 0.000621371).toFixed(1);
+
+        L.marker(res.lat, res.lng).addTo(map)
+          .bindPopup(`<b>${res.name}</b><br>Type: ${res.type}<br>Distance: ${distanceMiles} miles away`);
+      });
+    });
+  }
+
+  async function updateNeed(need, qrID) {
+    try {
+      // 1. Tell the Database
+      await fetch(`/update-location`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qrID: qrID, need: need })
+      });
+
+      // 2. Filter the map (Visual Magic)
+      alert(`Finding the nearest ${need} for you...`);
+       
+      // 3. Find the first resource that matches the need and zoom to it
+      const target = resources.find(r => r.type === need || r.type.includes(need));
+      if (target) {
+        map.flyTo([target.lat, target.lng], 16); // "Fly" animation to the spot!
+      }
+
+    } catch (err) {
+      console.error("Update failed", err);
+    }
+  }
+    
+</script> --}}
