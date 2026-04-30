@@ -31,9 +31,11 @@
     </button>
   </div>
 
-  <div id="map-section" class="map-containter">
+  <div id="map-section" class="map-container">
     <h3>Resources Near You</h3>
     <div id="map"></div>
+
+    <div id="directions-pane" class="directions-pane"></div>
 
     <div id="resource-list" class="resource-list">
       <p class="list-hint">Select a category above to see locations</p>
@@ -43,6 +45,8 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
 <script>
   // Initialize the map (coral gables center by default)
@@ -63,6 +67,7 @@
   let userLat = 25.7492;
   let userLng = -80.2632;
   let currentMarkers = [];
+  let routingControl = null;
 
   // Find client's real location and center map
   if (navigator.geolocation) {
@@ -91,6 +96,11 @@
       currentMarkers.forEach(m => map.removeLayer(m));
       currentMarkers = [];
 
+      if (routingControl) {
+        map.removeControl(routingControl);
+        routingControl = null;
+      }
+
       // Filter and Build List
       const filtered = resources.filter(r => r.type.includes(need));
       const listDiv = document.getElementById('resource-list');
@@ -116,13 +126,15 @@
         const item = document.createElement('div');
         item.className = 'resource-item';
         item.innerHTML = `
-        <div class="res-info">
-          <strong>${res.name}</strong>
-          <span>${res.address}</span>
-        </div>
-        <div class="res-stats">
-          <span class="miles">${miles} miles</span>
-          <span class="walk">~${walkMin} min walk</span>
+        <div class="res-header-row">
+          <div class="res-info">
+            <strong>${res.name}</strong>
+            <span>${res.address}</span>
+          </div>
+          <div class="res-stats">
+            <span class="miles">${miles} miles</span>
+            <span class="walk">~${walkMin} min walk</span>
+          </div>
         </div>
         `;
 
@@ -130,51 +142,55 @@
         item.onclick = () => {
           map.flyTo([res.lat, res.lng], 16);
           marker.openPopup();
-        };
-        listDiv.appendChild(item);
-      });
 
+          if (routingControl) {
+            map.removeControl(routingControl);
+            routingControl = null;
+          }
+
+          document.querySelectorAll('.mini-directions').forEach(el => el.remove());
+
+          const miniPane = document.createElement('div');
+          miniPane.className = 'mini-directions';
+          miniPane.innerHTML = '<p class="loading-msg" style="padding:10px; color:#333;">Calculating route...</p>';
+          item.appendChild(miniPane);
+
+          setTimeout(() => {
+
+            routingControl = L.Routing.control({
+              waypoints: [
+                L.latLng(userLat, userLng),
+                L.latLng(res.lat, res.lng)
+              ],
+              router: L.Routing.osrmv1({
+                serviceUrl: 'https://router.project-osrm.org/route/v1',
+                profile: 'foot'
+              }),
+              lineOptions: { 
+                styles: [{ color: 'blue', opacity: 0.7, weight: 5 }] 
+              },
+              createMarker: function() { return null; },
+              addWaypoints: false,
+              routeWhileDragging: false,
+              show: true,
+              getContainer: function() {
+                return miniPane;
+              }
+            }).on('routesfound', function() {
+              const msg = miniPane.querySelector('.loading-msg');
+              if (msg) msg.remove();
+            }).on('routingerror', function(e) {
+            miniPane.innerHTML = '<p style="padding:10px; color:red;">Unable to calculate route.</p>';
+            console.error("Routing error", e);
+          }).addTo(map);
+        }, 50);
+      };
+      listDiv.appendChild(item);
+    });
       //Scroll down to show the results
-      document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       console.error("Update failed", err);
     }
   }
 </script>
-
-{{!-- 
-      // Draw lines/distances to resources
-      resources.forEach(res => {
-        const distance = map.distance([lat, lng], [res.lat, res.lng]);
-        const distanceMiles = (distance * 0.000621371).toFixed(1);
-
-        L.marker(res.lat, res.lng).addTo(map)
-          .bindPopup(`<b>${res.name}</b><br>Type: ${res.type}<br>Distance: ${distanceMiles} miles away`);
-      });
-    });
-  }
-
-  async function updateNeed(need, qrID) {
-    try {
-      // 1. Tell the Database
-      await fetch(`/update-location`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ qrID: qrID, need: need })
-      });
-
-      // 2. Filter the map (Visual Magic)
-      alert(`Finding the nearest ${need} for you...`);
-       
-      // 3. Find the first resource that matches the need and zoom to it
-      const target = resources.find(r => r.type === need || r.type.includes(need));
-      if (target) {
-        map.flyTo([target.lat, target.lng], 16); // "Fly" animation to the spot!
-      }
-
-    } catch (err) {
-      console.error("Update failed", err);
-    }
-  }
-    
-</script> --}}

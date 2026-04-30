@@ -183,6 +183,183 @@ body {
   text-align: center;
 }
 
+/* 1. THE MAP OVERLAY: Completely hide the default floating box on the map */
+.leaflet-top.leaflet-right .leaflet-routing-container {
+    display: none !important;
+}
+
+/* 2. THE RESOURCE CARD: Ensure it stacks vertically when directions appear */
+.resource-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+    background: white;
+}
+
+.resource-item:hover {
+    background: #f0f7ff;
+}
+
+/* 3. THE HEADER ROW: Keeps Name/Address on left and Miles/Walk on right */
+.res-header-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+/* 4. THE DIRECTIONS BOX: The container we create in the JS */
+.mini-directions {
+    margin-top: 15px;
+    padding: 5px;
+    background: #f8f9fa !important;
+    border-radius: 8px;
+    border-left: 4px solid #2c3e50 !important;
+    width: 100% !important;
+    clear: both;
+    overflow: hidden; /* Prevents the horizontal scrollbar seen in your screenshots */
+}
+
+/* 5. THE CONTENT: Force the Leaflet table to be visible and readable */
+.mini-directions .leaflet-routing-container,
+.mini-directions .leaflet-routing-alt,
+.mini-directions .leaflet-routing-container-hide,
+.mini-directions .leaflet-routing-alt-hidden {
+    display: block !important;
+    visibility: visible !important;
+    max-height: none !important;
+    height: auto !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* 6. THE TABLE: Fix text colors and spacing */
+.mini-directions table {
+    width: 100% !important;
+    border-collapse: collapse;
+}
+
+.mini-directions td {
+    padding: 10px 5px !important;
+    font-size: 0.85rem !important;
+    color: #2d3748 !important; /* Forces dark text instead of map-default white */
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* 7. CLEANUP: Hide unnecessary titles inside the small card */
+.mini-directions h2, 
+.mini-directions h3,
+.mini-directions .leaflet-routing-icon {
+    display: none !important;
+}
+/* Directions Pane */
+/* .directions-pane {
+  max-width: 200px;
+  overflow-y: auto;
+  background: #f9f9f9;
+  border-left: 5px solid #2c3e50;
+  margin: 10px 0;
+  padding: 10px;
+  font-size: 0.9rem;
+  display: none;
+}
+
+.directions-pane:npt:empty {
+  display: block;
+} */
+
+/* .leaflet-routing-container {
+  position: static !important;
+  float: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  display: block !important;
+}
+
+
+.mini-directions {
+  margin-top: 15px;
+  padding: 10px;
+  background: #f8f9fa !important;
+  border-radius: 8px;
+  border-left: 4px solid #2c3e50 !important;
+  width: 100% !important;
+  display: block !important;
+  color: #333 !important;
+  clear: both;
+}
+
+.mini-directions table {
+  width: 100% !important;
+  border-collapse: collapse;
+}
+
+.mini-directions td {
+  padding: 8px 4px !important;
+  font-size: 0.85rem !important;
+  border-bottom: 1px solid #dee2e6;
+  color: #333 !important;
+}
+
+.mini-directions h2, 
+.mini-directions h3,
+.leaflet-routing-alt h2,
+.leaflet-routing-alt h3 {
+  display: none !important;
+}
+
+.leaflet-top.leaflet-right .leaflet-routing-container {
+  display: none !important;
+}
+
+.resource-item .leaflet-routing-container {
+  display: block !important;
+  position: relative !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.resource-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.res-header-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.mini-directions .leaflet-routing-container {
+  display: block !important;
+  width: 100% !important;
+  max-height: none !important;
+}
+
+.mini-directions .leaflet-routing-alt {
+  max-height: none !important;
+  overflow: visible !important;
+  display: block !important;
+}
+
+.mini-directions .leaflet-routing-alt table {
+  color: #333 !important;
+  background: transparent !important;
+} */
 
 /* landing page grid */
 .hero-section {
