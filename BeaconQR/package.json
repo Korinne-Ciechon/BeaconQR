@@ -13,8 +13,8 @@
     "hbs": "~4.0.4",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
-    "sequelize": "^6.37.8",
-    "sqlite3": "^6.0.1"
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
   },
   "config": {
     "build_from_source": true
