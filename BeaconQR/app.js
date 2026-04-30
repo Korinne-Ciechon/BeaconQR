@@ -9,6 +9,7 @@ var app = express();
 
 const { Sequelize } = require('sequelize');
 const { DataTypes } = require('sequelize');
+const { Op } = require('sequelize');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -34,6 +35,23 @@ const Client = sequelize.define('Client',{
   lastLat: { type: DataTypes.FLOAT },
   lastLng: { type: DataTypes.FLOAT },
   lastNeed: { type: DataTypes.STRING }
+});
+
+hbs.registerHelper('formatDate', function(date) {
+  if (!date) return "Never";
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  });
+});
+
+hbs.registerHelper('ifCond', function (v1, operator, v2, options) {
+  switch (operator) {
+    case '===': return (v1 === v2) ? options.fn(this) : options.inverse(this);
+    default: return options.inverse(this);
+  }
 });
 
 // Sync Database
@@ -99,7 +117,10 @@ app.get('/portal/:qrID', async (req,res) => {
     const client = await Client.findOne({ where: { qrID: req.params.qrID } });
     if (!client) return res.status(404).render('error', { message: 'Client Not Found' });
 
-    res.render('portal', { client: client.get({ plain: true }) });
+    res.render('portal', { 
+      client: client.get({ plain: true }),
+      showSignOut: true 
+    });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -120,37 +141,20 @@ app.post('/update-status/:qrID', async (req,res) => {
 });
 
 // Update Location
-// app.post('/update-location', async (req,res) => {
-//   try {
-//     const { qrID, lat, lng, need } = req.body;
-//     await Client.update(
-//       { lastLat: lat, lastLng: lng, lastSeen: new Date(), lastNeed: need },
-//       { where: { qrID: qrID } }
-//     );
-//     res.json({ success: true });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
+app.post('/update-location', async (req,res) => {
+  try {
+    const { qrID, lat, lng, need } = req.body;
+    await Client.update(
+      { lastLat: lat, lastLng: lng, lastSeen: new Date(), lastNeed: need },
+      { where: { qrID: qrID } }
+    );
+    console.log(`Updated ${qrID} with need: ${need}`); // Look for this in your terminal!
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-// Results
-// app.get('/results', (req, res) => {
-//   res.render('results', { 
-//     title: 'Nearby Resources', 
-//     need: req.query.need 
-//   });
-// });
-
-// Family view
-
-// app.get('/family-lookup', (req, res) => {
-//   const id = req.query.qrID;
-//   if (id) {
-//     res.redirect(`/family/${id}`);
-//   } else {
-//     res.redirect('/');
-//   }
-// });
 
 app.get('/family/:qrID', async (req,res) => {
   try {
@@ -162,7 +166,10 @@ app.get('/family/:qrID', async (req,res) => {
     const hoursSinceSeen = (new Date() - new Date(data.lastSeen)) / (1000 * 60 * 60);
     const activeRecently = hoursSinceSeen < 24;
 
-    res.render('family', { client: data, activeRecently });
+    res.render('family', { 
+      client: data, activeRecently,
+      showSignOut: true 
+    });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -171,12 +178,76 @@ app.get('/family/:qrID', async (req,res) => {
 // Caseworker Dashboard (shows all clients)
 app.get('/caseworker', async (req, res) => {
   try {
-    const allClients = await Client.findAll();
-    const cleanData = allClients.map(c => c.get({ plain: true }));
+    const allClients = await Client.findAll({
+      order: [['lastSeen', 'DESC']]
+    });
+    const cleanData = allClients.map(c => {
+      const plain = c.get({ plain: true });
+      const lastSeenDate = new Date(plain.lastSeen);
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      plain.activeRecently = lastSeenDate > oneDayAgo;
+      return plain;
+    });
 
     res.render('caseworker', {
       title: 'Caseworker Dashboard',
-      clients: cleanData
+      clients: cleanData,
+      activeTab: 'master',
+      showSignOut: true
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// CaseWorker: Intake Page
+app.get('/caseworker/intake', (req, res) => {
+  res.render('intake', { 
+    title: 'New Client Intake',
+    showSignOut: true
+  });
+});
+
+//Handle the Intake form Submission
+app.post('/create-client', async (req, res) => {
+  try {
+    const { name, qrID} = req.body;
+    await Client.create({
+      name: name, 
+      qrID: qrID,
+      lastSeen: new Date(),
+      lastNeed: 'Initial Intake',
+    });
+    res.redirect('/caseworker');
+  } catch (err) {
+    res.status(500).send("Error creating client. Try another QR ID.")
+  }
+});
+
+// Caseworker Urgent Alerts Page 
+app.get('/caseworker/alerts', async (req, res) => {
+  try {
+    const urgentClients = await Client.findAll({
+      where: { 
+        lastNeed: {
+          [Op.like]: '%Worker%'
+        }
+      },
+      order: [['lastSeen', 'DESC']]
+    });
+
+    const cleanData = urgentClients.map(c => {
+      const plain = c.get({ plain: true });
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      plain.activeRecently = new Date(plain.lastSeen) > oneDayAgo;
+      return plain;
+    });
+
+    res.render('alerts', {
+      title: 'Urgent Requests',
+      clients: cleanData,
+      activeTab: 'alerts',
+      showSignOut: true
     });
   } catch (err) {
     res.status(500).send(err.message);

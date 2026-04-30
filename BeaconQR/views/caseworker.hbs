@@ -1,4 +1,6 @@
 <div class="dashboard-container">
+  {{> caseworkerNav}} 
+  
   <header class="dashoard-header">
     <h1>Caseworker Dashboard</h1>
     <p>Monitoring all active Beacon Beacons</p>
@@ -7,7 +9,7 @@
   <div class="table-responsive">
     <table class="caseworker-table">
       <thead>
-        <tr>
+        <tr class="table-header-row">
           <th>Client Name</th>
           <th>QR ID</th>
           <th>Status</th>
@@ -19,17 +21,23 @@
       <tbody>
         {{#each clients}}
         <tr>
-          <td><strong>{{this.name}}</strong></td>
-          <td><code>{{this.qrID}}</code></td>
-          {{#if this.activeRecently}}
-            <td class="status-active">ACTIVE</td>
-          {{else}}
-            <td class="status-inactive">INACTIVE</td>
-          {{/if}}
-          <td><span class="need-badge">{{this.lastSeen}}</span></td>
-          <td>{{this.lastNeed}}</td>
+          <td class="client-name"><strong>{{this.name}}</strong></td>
+          <td><code class="qr-badge">{{this.qrID}}</code></td>
           <td>
-              <a href="/family/{{this.qrID}}" class="view-link">View Safety Profile</a>
+            {{#if this.activeRecently}}
+              <span class="status-pill active">ACTIVE</span>
+            {{else}}
+              <span class="status-pill inactive">INACTIVE</span>
+            {{/if}}
+          </td>
+          <td class="time-text">{{formatDate this.lastSeen}}</td>
+          <td>
+            <span class="need-text {{#ifCond this.lastNeed '===' 'CaseWorker'}}urgent-text{{/ifCond}}">
+              {{this.lastNeed}}
+            </span>
+          </td>
+          <td>
+              <a href="/family/{{this.qrID}}" class="view-link-btn">View Profile</a>
           </td>
         </tr>
         {{/each}}
@@ -37,71 +45,3 @@
     </table>
   </div>
 </div>
-
-
-
-
-
-
-
-
-
-<form action="/chart" method="post">
-  <label for="color">Color:</label>
-  <select id="color" name="color" required>
-    <option value="red">Red</option>
-    <option value="blue">Blue</option>
-    <option value="yellow">Yellow</option>
-  </select>
- 
-  <button type="submit">Submit</button>
-</form>
-<div>
-  
-  {{#each poll}}
-    <p>{{this.color}}: {{this.amount}}</p>
-  {{/each}} 
-  
-  </div>
-<div>
-  <canvas id="barChart"></canvas>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
- 
-  var pollData = {{{ pollJSON }}};
-  console.log(pollData);
-  let colors = [];
-  let amounts = [];
-  for (let i = 0; i < pollData.length; i++) {
-    colors.push(pollData[i].color);
-    amounts.push(pollData[i].amount);
-  }
-  console.log(colors);
-  console.log(amounts);
-
-const ctx = document.getElementById('barChart');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: colors,
-      datasets: [{
-        label: '# of Votes',
-        data: amounts,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-
- 
-</script>
-  

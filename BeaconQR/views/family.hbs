@@ -1,26 +1,41 @@
-<div class="family-portal">
-    <h1>Family Monitoring: {{client.name}}</h1>
-    <p class="form-label"> QR ID: {{client.qrID}}</p>
-    <hr>
+<div class="family-container">
+    <header class="family-header">
+        <h1>{{client.name}}'s Safety Profile</h1>
+        <span class="qr-badge"> ID: {{client.qrID}}</span>
+    </header>
 
-    <div class="status-container">
-        {{#if activeRecently}}
-            <div class="status-indicator status-active">
-                <span class="dot"></span> 
-                <h2>ACTIVE</h2>
-                <p>Checked in within last 24 hours.</p>
+    <div class="family-grid">
+        <div class="status-card {{#if activeRecently}}is-active{{else}}is-inactive{{/if}}">
+            <div class="status-icon">
+                {{#if activeRecently}}🟢{{else}}🔴{{/if}}
             </div>
-        {{else}}
-            <div class="status-indicator status-inactive">
-                <span class="dot"></span>
-                <h2>INACTIVE</h2>
-                <p>No check-in recorded in the last 24 hours.</p>
+            <h2>Current Status: {{#if activeRecently}}Active{{else}}Inactive{{/if}}</h2>
+            <p class="status-desc">
+            {{#if activeRecently}}
+                {{client.name}} has interacted with a Beacon resource in the last 24 hours.
+            {{else}}
+                We haven't seen a scan in over 24 hours. We recommend checking in with {{client.name}}'s caseworker.
+            {{/if}}
+            </p>
+        </div>
 
+        <div class="info-card">
+            <h3>Latest Activity</h3>
+            <div class="info-row">
+                <span class="label">Last Check-in</span>
+                <span class="value">{{formatDate client.lastSeen}}</span>
             </div>
-        {{/if}}
+            <div class="info-row">
+                <span class="label">Last Service Used</span>
+                <span class="value-badge">{{client.lastNeed}}</span>
+            </div>
+
+            <hr class="card-divider">
+
+            <h3>Last Known Location</h3>
+            <div class="location-box">
+                <p class="location-text">Recorded near Coral Gables, FL</p>
+            </div>
+        </div>
     </div>
-    <div class="details-box">
-        <p><strong>Last Seen:</strong> {{client.lastSeen}}</p>
-        <p><strong>Last Need:</strong> {{client.lastNeed}}</p>
-    </div>
-</div>
+</div>    

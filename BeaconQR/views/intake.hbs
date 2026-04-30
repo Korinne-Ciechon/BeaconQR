@@ -1,0 +1,31 @@
+<div class="dashboard-container">
+  {{> caseworkerNav}} <header class="dashoard-header">
+    <h1>New Client Intake</h1>
+    <p>Assign a new Beacon QR ID to a client.</p>
+  </header>
+
+  <form action="/create-client" method="POST" class="intake-form">
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" name="name" placeholder="Client Name" required>
+    </div>
+
+    <div class="form-group">
+      <label>QR ID (Secret Code)</label>
+      <div class="qr-input-group">
+        <input type="text" name="qrID" id="qrID" placeholder="e.g. beacon-772" required>
+        <button type="button" onclick="generateID()">Auto-Gen</button>
+      </div>
+      <small>This will be the end of their URL (beaconqr.com/portal/ID)</small>
+    </div>
+
+    <button type="submit" class="submit-btn">Create Profile & Generate QR</button>
+  </form>
+</div>
+
+<script>
+  function generateID() {
+    const random = Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('qrID').value = 'beacon-' + random;
+  }
+</script>

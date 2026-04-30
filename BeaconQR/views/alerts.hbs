@@ -1,0 +1,21 @@
+<div class="dashboard-container">
+    {{> caseworkerNav}} <div class="alert-banner">
+        <h2>High Priority Requests</h2>
+        <p>The following clients have requested caseworker assistance.</p>
+    </div>
+
+    <div class="alert-grid">
+        {{#each clients}}
+        <div class="alert-card">
+            <div class="alert-header">
+                <strong>{{this.name}}</strong>
+                <span class="time-ago">{{formatDate this.lastSeen}}</span>
+            </div>
+            <div class="alert-actions">
+                <a href="/family/{{this.qrID}}" class="view-btn">View Profile</a>
+                <button class="resolve-btn">Mark as Contacted</button>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>

@@ -5,8 +5,9 @@
             <span class="brand-text">Beacon<span class="qr-highlight">QR</span></span>
         </a>
         <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/caseworker">Caseworker Portal</a>
+            {{#if showSignOut}}
+                <a href="/" class="sign-out">Sign Out</a>
+            {{/if}}
         </div>
     </div>
 </nav>
