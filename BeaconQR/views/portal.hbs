@@ -124,20 +124,121 @@
         const item = document.createElement('div');
         item.className = 'resource-item';
         item.innerHTML = `
-        <div class="res-header-row">
-          <div class="res-info">
-            <strong>${res.name}</strong>
-            <span>${res.address}</span>
+          <div class="res-header-row">
+            <div class="res-info">
+              <strong>${res.name}</strong>
+              <span>${res.address}</span>
+            </div>
+            <div class="res-stats">
+              <span class="miles">${miles} miles</span>
+              <span class="walk">~${walkMin} min walk</span>
+            </div>
           </div>
-          <div class="res-stats">
-            <span class="miles">${miles} miles</span>
-            <span class="walk">~${walkMin} min walk</span>
-          </div>
-        </div>
         `;
 
         // Clicking an item zooms to it
+
         item.onclick = () => {
+          map.flyTo([res.lat, res.lng], 16);
+          marker.openPopup();
+
+          if (routingControl) {
+            map.removeControl(routingControl);
+          }
+
+          document.querySelectorAll('.mini-directions').forEach(el => el.remove());
+
+          const miniPane = document.createElement('div');
+          miniPane.className = 'mini-directions';
+          miniPane.innerHTML = '<p style="padding:10px;">Finding best walking path...</p>';
+          item.appendChild(miniPane);
+
+          routingControl = L.Routing.control({
+            waypoints: [
+            L.latLng(userLat, userLng),
+            L.latLng(res.lat, res.lng)
+            ],
+            router: L.Routing.osrmv1({
+              serviceUrl: 'https://router.project-osrm.org/route/v1',
+              profile: 'foot'
+            }),
+            lineOptions: {
+              styles: [{ color: '#5e8fcb', opacity: 0.8, weight: 6 }]
+            },
+            createMarker: function() { return null; },
+            addWaypoints: false,
+            routeWhileDragging: false,
+            show: false
+          }).on('routesfound', function(e) {
+            const routes = e.routes[0];
+            let html = '<div class="steps-container" style="padding: 10px 0;">';
+
+            routes.instructions.forEach((step, index) => {
+              let icon = '⬆️';
+              let text = step.text;
+
+              if (text.toLowerCase().includes('left')) icon = '⬅️';
+              if (text.toLowerCase().includes('right')) icon = '➡️';
+              if (index === routes.instructions.length - 1) icon = '📍';
+
+              let shortText = text
+                .replace(/Turn (left|right) onto /i, ' Turn $1 on ')
+                .replace(/Head (north|south|east|west|northwest|northeast|southwest|southeast) on /i, 'Walk on ')
+                .replace(/at the traffic circle, take the \d+ exit onto/i, 'At circle, exit to')
+                .replace(/Destination will be on your (left|right)/i, 'Arrive (on $1)');
+
+              shortText = shortText
+                .replace('Boulevard', 'Blvd')
+                .replace('Avenue', 'Ave')
+                .replace('Street', 'St')
+                .replace('Drive', 'Dr');
+
+              const feet = Math.round(step.distance * 3.28);
+              const distanceText = feet > 30 ? `${feet} ft` : 'Soon';
+
+              html += `
+                <div class="visual-step">
+                  <div class="step-icon-box">${icon}</div>
+                  <div class="step-details">
+                      <span class="step-action">${shortText}</span>
+                      <span class="step-dist">${distanceText}</span>
+                  </div>
+                </div>`;
+            });
+
+            html += '</div>';
+            miniPane.innerHTML = html;
+          
+
+
+            
+            //let html = '<div class="steps-container"><strong>Walking Directions:</strong><ol>';
+            
+            //routes.instructions.forEach(step => {
+            //  html += `<li>${step.text} <small>(${Math.round(step.distance)}m)</small></li>`;
+            //});
+        
+            //html += '</ol></div>';
+            //miniPane.innerHTML = html;
+          }).addTo(map);
+        };
+    
+        listDiv.appendChild(item);
+      });
+      //Scroll down to show the results
+      document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' });
+      } catch (err) {
+        console.error("Update failed", err);
+      }
+  }
+    
+</script>
+
+
+
+
+
+{{!-- item.onclick = () => {
           map.flyTo([res.lat, res.lng], 16);
           marker.openPopup();
 
@@ -182,14 +283,4 @@
             miniPane.innerHTML = '<p style="padding:10px; color:red;">Unable to calculate route.</p>';
             console.error("Routing error", e);
           }).addTo(map);
-        }, 50);
-      };
-      listDiv.appendChild(item);
-    });
-      //Scroll down to show the results
-    document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' });
-    } catch (err) {
-      console.error("Update failed", err);
-    }
-  }
-</script>
+        }, 50); --}}
