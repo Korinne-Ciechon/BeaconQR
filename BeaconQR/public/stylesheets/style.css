@@ -258,6 +258,24 @@ body {
 .mini-directions .leaflet-routing-icon {
     display: none !important;
 }
+
+.routing-container-hidden {
+  display: none !important;
+}
+
+.mini-directions .leaflet-routing-container,
+.mini-directions {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.mini-directions:has(table) .loading-msg {
+  display: none !important;
+}
+
 /* Directions Pane */
 /* .directions-pane {
   max-width: 200px;

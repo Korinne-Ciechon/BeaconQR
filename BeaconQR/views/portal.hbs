@@ -35,8 +35,6 @@
     <h3>Resources Near You</h3>
     <div id="map"></div>
 
-    <div id="directions-pane" class="directions-pane"></div>
-
     <div id="resource-list" class="resource-list">
       <p class="list-hint">Select a category above to see locations</p>
     </div>
@@ -173,6 +171,7 @@
               addWaypoints: false,
               routeWhileDragging: false,
               show: true,
+              collapsible: false,
               getContainer: function() {
                 return miniPane;
               }
